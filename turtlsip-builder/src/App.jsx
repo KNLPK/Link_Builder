@@ -140,7 +140,7 @@ function App() {
               ))}
             </div>
             <div className="social-selector-grid">
-              {['instagram', 'youtube', 'tiktok', 'whatsapp', 'x-twitter', 'github'].map(s => (
+              {['instagram', 'youtube', 'tiktok', 'whatsapp', 'x-twitter', 'github', 'facebook', 'linkedin'].map(s => (
                 <button key={s} className="social-choice" onClick={() => addSocial(s)}><i className={`fa-brands fa-${s}`}></i></button>
               ))}
             </div>

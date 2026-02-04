@@ -55,11 +55,10 @@ input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px r
 
 /* --- [7. SOCIAL LINKS EDITOR] --- */
 .social-links-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-.social-input-item { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--border); padding: 8px 12px; border-radius: 12px; }
-.social-input-item i { width: 20px; text-align: center; color: var(--green); font-size: 18px; }
-.social-selector-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.social-choice { aspect-ratio: 1; border: 1px solid var(--border); background: #fff; border-radius: 8px; cursor: pointer; color: var(--muted); transition: 0.2s; font-size: 20px; }
-.social-choice:hover { border-color: var(--green); color: var(--green); background: #f4f7f5; }
+.social-input-item { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--border); padding: 8px 12px; border-radius: 12px; }.social-input-item i { width: 20px; text-align: center; color: var(--green); font-size: 18px; }
+.social-selector-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-start; } /* Berubah dari grid ke flex agar tidak lebar */
+.social-choice { width: 50px; height: 50px; border: 1px solid var(--border); background: #fff; border-radius: 12px; cursor: pointer; color: var(--muted); transition: 0.2s; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }.social-choice:hover { border-color: var(--green); color: var(--green); background: #f4f7f5; }
+.social-choice:hover { border-color: var(--green); color: var(--green); background: #f4f7f5; transform: translateY(-2px); }
 .btn-remove-social { width: 34px; height: 34px; border: 1px solid var(--border); background: #F4F7F5; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: 0.2s; flex-shrink: 0; }
 .btn-remove-social:hover { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
 
@@ -89,5 +88,6 @@ input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px r
 .toast.show { transform: translateY(0); opacity: 1; }
 .toast-icon { width: 24px; height: 24px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 
-/* --- [11. RESPONSIVE DESIGN] --- */
-@media (max-width: 992px) { .wrap { flex-direction: column; padding: 20px; gap: 20px; } .panel, .editor { width: 100%; } .block-choices-grid { grid-template-columns: repeat(2, 1fr); } }
+/* --- [11. ENHANCED RESPONSIVE DESIGN] --- */
+@media (max-width: 992px) { .top { padding: 12px 20px; } .brand-logo { height: 40px; margin-left: 0; } .wrap { flex-direction: column; padding: 20px; gap: 24px; } .panel { width: 100%; order: 2; } .editor { width: 100%; order: 1; } .card { padding: 20px; } .block-choices-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+@media (max-width: 480px) { .top-actions .btn span { display: none; } .top-actions .btn { padding: 10px; } .modal-container { padding: 24px; width: 95%; } .social-selector-grid { grid-template-columns: repeat(3, 1fr); } .card h3 { font-size: 18px; } .btn.primary.small { padding: 6px 12px; font-size: 11px; } }
