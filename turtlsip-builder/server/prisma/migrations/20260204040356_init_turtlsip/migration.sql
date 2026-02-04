@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "Page" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,

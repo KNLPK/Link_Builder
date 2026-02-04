@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
 export const useTurtlLogic = () => {
-  // 1. Inisialisasi State: Mengambil dari localStorage sebagai cache lokal
   const [pages, setPages] = useState(() => {
     const saved = localStorage.getItem('mysticalLinkPages');
     return saved ? JSON.parse(saved) : [
@@ -11,24 +10,17 @@ export const useTurtlLogic = () => {
 
   const [activePageId, setActivePageId] = useState(localStorage.getItem('lastActiveId') || pages[0].id);
 
-  // 2. Sinkronisasi Otomatis ke LocalStorage (Cache)
-  // Ini memastikan jika browser tertutup mendadak, pekerjaanmu di UI tidak hilang
   useEffect(() => {
     localStorage.setItem('mysticalLinkPages', JSON.stringify(pages));
     localStorage.setItem('lastActiveId', activePageId);
   }, [pages, activePageId]);
 
-  // 3. Mendapatkan data halaman yang sedang aktif
   const activePage = pages.find(p => p.id === activePageId) || pages[0];
 
-  // 4. Helper: Fungsi pusat untuk memperbarui state halaman
   const updateActivePage = useCallback((newData) => {
     setPages(prev => prev.map(p => p.id === activePageId ? { ...p, ...newData } : p));
   }, [activePageId]);
 
-  // --- [FUNGSI INTEGRASI DATABASE] ---
-
-  // Fungsi krusial: Mengisi seluruh data dari PostgreSQL ke dalam UI
   const setFullPageData = (data) => {
     updateActivePage({
       headline: data.headline || '',
@@ -39,7 +31,6 @@ export const useTurtlLogic = () => {
     });
   };
 
-  // --- [IMAGE HELPER] ---
   const processFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       if (!file) return reject("No file selected");
@@ -59,7 +50,6 @@ export const useTurtlLogic = () => {
     }
   };
 
-  // --- [MANAGEMENT HALAMAN] ---
   const renamePage = (id, newName) => {
     setPages(prev => prev.map(p => p.id === id ? { ...p, name: newName } : p));
   };
@@ -78,7 +68,6 @@ export const useTurtlLogic = () => {
     setActivePageId(newPage.id);
   };
 
-  // --- [LOGIKA BLOK & SOSIAL] ---
   const reorderBlocks = (sourceIndex, targetIndex) => {
     const newBlocks = [...(activePage.blocks || [])];
     const [movedBlock] = newBlocks.splice(sourceIndex, 1);
@@ -89,7 +78,7 @@ export const useTurtlLogic = () => {
   return {
     pages, activePage, activePageId, setActivePageId, renamePage, deletePage, addPage,
     updateProfile: (field, value) => updateActivePage({ [field]: value }),
-    setFullPageData, // Diekspos agar App.jsx bisa memanggilnya saat loading
+    setFullPageData, 
     processFileToBase64, 
     updateProfileImage,
     addSocial: (type) => {

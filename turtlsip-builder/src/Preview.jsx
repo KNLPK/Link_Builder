@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Import axios untuk sinkronisasi DB
-import { ChevronRight } from 'lucide-react'; // Ikon panah sesuai desain
+import axios from 'axios';
+import { ChevronRight } from 'lucide-react'; 
 import './Preview.css';
 
 function Preview() {
   const [activePage, setActivePage] = useState(null);
 
-  // Mengambil data langsung dari PostgreSQL melalui API
   const loadPreviewData = async () => {
     try {
       const res = await axios.get('http://localhost:3001/api/pages');

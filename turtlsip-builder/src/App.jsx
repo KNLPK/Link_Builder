@@ -163,25 +163,18 @@ function App() {
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => { reorderBlocks(draggedIndex, idx); setDraggedIndex(null); }}>
 
-                  {/* 1. Drag Handle */}
                   <div className="drag-handle"><GripVertical size={18} /></div>
-
-                  {/* 2. NEW: Block Type Icon Visual */}
                   <div className={`block-type-visual icon-${block.type}`}>
                     {block.type === 'button' && <LinkIcon size={20} />}
                     {block.type === 'text' && <Type size={20} />}
                     {block.type === 'image' && <ImageIcon size={20} />}
                   </div>
-
-                  {/* 3. Block Info Text */}
                   <div className="block-info-text">
                     {block.type === 'image' ?
                       <img src={block.content} alt="Thumb" className="block-thumb" /> :
                       (block.label || block.content)
                     }
                   </div>
-
-                  {/* 4. Delete Button */}
                   <button className="btn-delete" onClick={() => deleteBlock(idx)}><Trash2 size={16} /></button>
                 </div>
               ))}
