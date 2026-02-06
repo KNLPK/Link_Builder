@@ -33,10 +33,7 @@ function App() {
     try {
       const response = await axios.get('http://localhost:3001/api/pages');
       if (response.data && response.data.length > 0) {
-        const savedPage = response.data[0];
-
-        setFullPageData(savedPage);
-
+        setFullPageData(response.data[0]);
         showToast("Database Synced");
       }
     } catch (error) {
@@ -52,6 +49,10 @@ function App() {
   }, []);
 
   const handleSaveToDatabase = async () => {
+    if (!activePage.headline || !activePage.headline.trim()) {
+      return showToast("Error: Headline is required!");
+    }
+
     try {
       const response = await axios.post('http://localhost:3001/api/save', activePage);
       if (response.data.success) {
@@ -62,7 +63,6 @@ function App() {
       showToast("Error: Failed to reach database");
     }
   };
-
 
   const handleBlockImageSelect = async (e) => {
     const file = e.target.files[0];
@@ -190,24 +190,69 @@ function App() {
           <div className="modal-container">
             <button className="modal-close" onClick={closeModal}><X size={20} /></button>
             <input type="file" id="block-image-upload" hidden accept="image/*" onChange={handleBlockImageSelect} />
+            
             {modal.type === 'page' && (
-              <><h3>Create Page</h3><input type="text" value={tempData.pageName} onChange={(e) => setTempData({ ...tempData, pageName: e.target.value })} placeholder="Page Name" /><button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => { addPage(tempData.pageName); closeModal(); showToast("Page Created"); }}>Create</button></>
+              <>
+                <h3>Create Page</h3>
+                <input type="text" value={tempData.pageName} onChange={(e) => setTempData({ ...tempData, pageName: e.target.value })} placeholder="Page Name" />
+                <button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => {
+                  if (!tempData.pageName.trim()) return showToast("Error: Page name is required!");
+                  addPage(tempData.pageName); closeModal(); showToast("Page Created");
+                }}>Create</button>
+              </>
             )}
+
             {modal.type === 'rename' && (
-              <><h3>Rename Page</h3><input type="text" value={tempData.pageName} onChange={(e) => setTempData({ ...tempData, pageName: e.target.value })} placeholder="New Name" /><button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => { renamePage(modal.targetId, tempData.pageName); closeModal(); showToast("Page Renamed"); }}>Rename</button></>
+              <>
+                <h3>Rename Page</h3>
+                <input type="text" value={tempData.pageName} onChange={(e) => setTempData({ ...tempData, pageName: e.target.value })} placeholder="New Name" />
+                <button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => {
+                  if (!tempData.pageName.trim()) return showToast("Error: Name cannot be empty!");
+                  renamePage(modal.targetId, tempData.pageName); closeModal(); showToast("Page Renamed");
+                }}>Rename</button>
+              </>
             )}
+
             {modal.type === 'chooser' && (
-              <><h3>Add New Block</h3><div className="block-choices-grid">
-                <div className="modal-choice-item choice-link" onClick={() => setModal({ type: 'button', open: true })}><div className="block-symbol"><LinkIcon size={32} /></div><span>Link</span></div>
-                <div className="modal-choice-item choice-text" onClick={() => setModal({ type: 'text', open: true })}><div className="block-symbol"><Type size={32} /></div><span>Text</span></div>
-                <label htmlFor="block-image-upload" className="modal-choice-item choice-image"><div className="block-symbol"><ImageIcon size={32} /></div><span>Image</span></label>
-              </div></>
+              <>
+                <h3>Add New Block</h3>
+                <div className="block-choices-grid">
+                  <div className="modal-choice-item choice-link" onClick={() => setModal({ type: 'button', open: true })}><div className="block-symbol"><LinkIcon size={32} /></div><span>Link</span></div>
+                  <div className="modal-choice-item choice-text" onClick={() => setModal({ type: 'text', open: true })}><div className="block-symbol"><Type size={32} /></div><span>Text</span></div>
+                  <label htmlFor="block-image-upload" className="modal-choice-item choice-image"><div className="block-symbol"><ImageIcon size={32} /></div><span>Image</span></label>
+                </div>
+              </>
             )}
+
             {modal.type === 'button' && (
-              <><h3>Link Block</h3><input type="text" placeholder="Label" value={tempData.label} onChange={(e) => setTempData({ ...tempData, label: e.target.value })} /><input type="url" placeholder="URL" value={tempData.url} onChange={(e) => setTempData({ ...tempData, url: e.target.value })} /><button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => { addBlock('button', { label: tempData.label, url: tempData.url }); closeModal(); showToast("Block Added"); }}>Save</button></>
+              <>
+                <h3>Link Block</h3>
+                <input type="text" placeholder="Label (e.g. My Portfolio)" value={tempData.label} onChange={(e) => setTempData({ ...tempData, label: e.target.value })} />
+                <input type="url" placeholder="URL (https://...)" value={tempData.url} onChange={(e) => setTempData({ ...tempData, url: e.target.value })} />
+                <button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => {
+                  if (!tempData.label.trim() || !tempData.url.trim()) {
+                    return showToast("Error: Label or URL are required!");
+                  }
+                  addBlock('button', { label: tempData.label, url: tempData.url }); 
+                  closeModal(); 
+                  showToast("Link Block Added");
+                }}>Save</button>
+              </>
             )}
+
             {modal.type === 'text' && (
-              <><h3>Text Block</h3><textarea placeholder="Content" value={tempData.content} onChange={(e) => setTempData({ ...tempData, content: e.target.value })} rows="4" style={{ width: '100%', borderRadius: '12px', padding: '14px', border: '1.5px solid var(--border)', fontFamily: 'inherit' }} /><button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => { addBlock('text', { content: tempData.content }); closeModal(); showToast("Block Added"); }}>Save</button></>
+              <>
+                <h3>Text Block</h3>
+                <textarea placeholder="Write your content here..." value={tempData.content} onChange={(e) => setTempData({ ...tempData, content: e.target.value })} rows="4" style={{ width: '100%', borderRadius: '12px', padding: '14px', border: '1.5px solid var(--border)', fontFamily: 'inherit' }} />
+                <button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => {
+                  if (!tempData.content.trim()) {
+                    return showToast("Error: Text content cannot be empty!");
+                  }
+                  addBlock('text', { content: tempData.content }); 
+                  closeModal(); 
+                  showToast("Text Block Added");
+                }}>Save</button>
+              </>
             )}
           </div>
         </div>
