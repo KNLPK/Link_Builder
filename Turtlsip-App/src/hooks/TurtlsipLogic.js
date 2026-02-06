@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export const useTurtlLogic = () => {
+export const TurtlsipLogic = () => {
   const [pages, setPages] = useState(() => {
     const saved = localStorage.getItem('mysticalLinkPages');
     return saved ? JSON.parse(saved) : [

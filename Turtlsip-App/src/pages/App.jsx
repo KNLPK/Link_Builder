@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { CheckCircle, CloudUpload, Edit3, GripVertical, Image as ImageIcon, Link as LinkIcon, Plus, Trash2, Type, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import './App.css';
-import logo from './assets/turtlsip_logo_text.svg';
-import { useTurtlLogic } from './useTurtlLogic';
+import '../styles/App.css';
+import logo from '../assets/turtlsip_logo_text.svg';
+import { TurtlsipLogic } from '../hooks/TurtlsipLogic.js';
 
 function App() {
   const {
@@ -11,7 +11,7 @@ function App() {
     addPage, updateProfile, updateProfileImage, processFileToBase64,
     addSocial, updateSocialUrl, removeSocial, addBlock, deleteBlock, reorderBlocks,
     setFullPageData
-  } = useTurtlLogic();
+  } = TurtlsipLogic();
 
   const [modal, setModal] = useState({ type: null, open: false, targetId: null });
   const [tempData, setTempData] = useState({ label: '', url: '', content: '', pageName: '' });
@@ -45,6 +45,7 @@ function App() {
   };
 
   useEffect(() => {
+    document.title = "Builder TurtlSip";
     loadInitialData();
   }, []);
 
@@ -83,7 +84,11 @@ function App() {
   return (
     <div className="builder-app">
       <header className="top">
-        <div className="brand"><img src={logo} alt="Logo" className="brand-logo" /></div>
+        <div className="brand">
+          <a href="/" style={{ display: 'block', textDecoration: 'none' }}>
+            <img src={logo} alt="Logo" className="brand-logo" />
+          </a>
+        </div>
         <div className="top-actions" style={{ display: 'flex', gap: '15px' }}>
           <button className="btn secondary" onClick={() => window.open('/preview', '_blank')}>Preview</button>
           <button className="btn primary publish-btn" onClick={handleSaveToDatabase}>
@@ -190,7 +195,7 @@ function App() {
           <div className="modal-container">
             <button className="modal-close" onClick={closeModal}><X size={20} /></button>
             <input type="file" id="block-image-upload" hidden accept="image/*" onChange={handleBlockImageSelect} />
-            
+
             {modal.type === 'page' && (
               <>
                 <h3>Create Page</h3>
@@ -233,8 +238,8 @@ function App() {
                   if (!tempData.label.trim() || !tempData.url.trim()) {
                     return showToast("Error: Label or URL are required!");
                   }
-                  addBlock('button', { label: tempData.label, url: tempData.url }); 
-                  closeModal(); 
+                  addBlock('button', { label: tempData.label, url: tempData.url });
+                  closeModal();
                   showToast("Link Block Added");
                 }}>Save</button>
               </>
@@ -248,8 +253,8 @@ function App() {
                   if (!tempData.content.trim()) {
                     return showToast("Error: Text content cannot be empty!");
                   }
-                  addBlock('text', { content: tempData.content }); 
-                  closeModal(); 
+                  addBlock('text', { content: tempData.content });
+                  closeModal();
                   showToast("Text Block Added");
                 }}>Save</button>
               </>

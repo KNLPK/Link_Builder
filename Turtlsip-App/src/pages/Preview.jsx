@@ -1,16 +1,27 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ChevronRight } from 'lucide-react'; 
-import './Preview.css';
+import { ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import '../styles/Preview.css';
 
 function Preview() {
   const [activePage, setActivePage] = useState(null);
+
+  useEffect(() => {
+    const originalTitle = document.title; 
+    document.title = "Preview TurtlSip"; 
+
+    return () => {
+      document.title = originalTitle; 
+    };
+  }, []);
 
   const loadPreviewData = async () => {
     try {
       const res = await axios.get('http://localhost:3001/api/pages');
       if (res.data && res.data.length > 0) setActivePage(res.data[0]);
-    } catch (e) { console.error("Database connection failed for preview", e); }
+    } catch (e) { 
+      console.error("Database connection failed for preview", e); 
+    }
   };
 
   useEffect(() => { loadPreviewData(); }, []);
@@ -21,14 +32,18 @@ function Preview() {
     <div className="preview-container">
       <div className="preview-content">
         <header className="preview-header">
-          <div className="preview-avatar"><img src={activePage.profileImg || `https://ui-avatars.com/api/?name=${activePage.headline || 'User'}`} alt="Avatar" /></div>
+          <div className="preview-avatar">
+            <img src={activePage.profileImg || `https://ui-avatars.com/api/?name=${activePage.headline || 'User'}`} alt="Avatar" />
+          </div>
           <h1 className="preview-headline">@{activePage.headline || 'username'}</h1>
           <p className="preview-bio">{activePage.title || 'Welcome to my page'}</p>
         </header>
 
         <div className="preview-socials">
           {activePage.socialLinks?.map((l, i) => (
-            <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="social-icon-link"><i className={`fa-brands fa-${l.type}`}></i></a>
+            <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="social-icon-link">
+              <i className={`fa-brands fa-${l.type}`}></i>
+            </a>
           ))}
         </div>
 
