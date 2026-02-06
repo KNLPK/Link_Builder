@@ -2,13 +2,16 @@ import axios from 'axios';
 import { ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import '../styles/Preview.css';
+import logo from '../assets/turtlsip_logo_text.svg'; 
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 function Preview() {
   const [activePage, setActivePage] = useState(null);
 
   useEffect(() => {
     const originalTitle = document.title; 
-    document.title = "Preview TurtlSip"; 
+    document.title = "Preview — TurtlSip"; 
 
     return () => {
       document.title = originalTitle; 
@@ -17,7 +20,7 @@ function Preview() {
 
   const loadPreviewData = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/pages');
+      const res = await axios.get(`${API_BASE_URL}/api/pages`);
       if (res.data && res.data.length > 0) setActivePage(res.data[0]);
     } catch (e) { 
       console.error("Database connection failed for preview", e); 
@@ -33,7 +36,10 @@ function Preview() {
       <div className="preview-content">
         <header className="preview-header">
           <div className="preview-avatar">
-            <img src={activePage.profileImg || `https://ui-avatars.com/api/?name=${activePage.headline || 'User'}`} alt="Avatar" />
+            <img 
+              src={activePage.profileImg || `https://ui-avatars.com/api/?name=${activePage.headline || 'User'}`} 
+              alt="Avatar" 
+            />
           </div>
           <h1 className="preview-headline">@{activePage.headline || 'username'}</h1>
           <p className="preview-bio">{activePage.title || 'Welcome to my page'}</p>
@@ -41,7 +47,13 @@ function Preview() {
 
         <div className="preview-socials">
           {activePage.socialLinks?.map((l, i) => (
-            <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="social-icon-link">
+            <a 
+              key={l.id || `${l.type}-${i}`} 
+              href={l.url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="social-icon-link"
+            >
               <i className={`fa-brands fa-${l.type}`}></i>
             </a>
           ))}
@@ -63,7 +75,7 @@ function Preview() {
         </div>
 
         <footer className="preview-footer">
-          <img src="/src/assets/turtlsip_logo_text.svg" alt="TurtlSip" className="footer-logo" />
+          <img src={logo} alt="TurtlSip" className="footer-logo" />
           <p>Created with TurtlSip</p>
         </footer>
       </div>

@@ -2,17 +2,17 @@ import { useCallback, useEffect, useState } from 'react';
 
 export const TurtlsipLogic = () => {
   const [pages, setPages] = useState(() => {
-    const saved = localStorage.getItem('mysticalLinkPages');
+    const saved = localStorage.getItem('turtlsip_pages');
     return saved ? JSON.parse(saved) : [
       { id: 'page-home', name: 'Home Page', title: 'Welcome', headline: 'User', profileImg: '', blocks: [], socialLinks: [] }
     ];
   });
 
-  const [activePageId, setActivePageId] = useState(localStorage.getItem('lastActiveId') || pages[0].id);
+  const [activePageId, setActivePageId] = useState(localStorage.getItem('turtlsip_active_id') || pages[0].id);
 
   useEffect(() => {
-    localStorage.setItem('mysticalLinkPages', JSON.stringify(pages));
-    localStorage.setItem('lastActiveId', activePageId);
+    localStorage.setItem('turtlsip_pages', JSON.stringify(pages));
+    localStorage.setItem('turtlsip_active_id', activePageId);
   }, [pages, activePageId]);
 
   const activePage = pages.find(p => p.id === activePageId) || pages[0];
@@ -83,7 +83,9 @@ export const TurtlsipLogic = () => {
     updateProfileImage,
     addSocial: (type) => {
       if (activePage.socialLinks?.some(l => l.type === type)) return;
-      updateActivePage({ socialLinks: [...(activePage.socialLinks || []), { type: type, url: '' }] });
+      
+      const newSocial = { id: 'soc-' + Date.now(), type: type, url: '' };
+      updateActivePage({ socialLinks: [...(activePage.socialLinks || []), newSocial] });
     },
     updateSocialUrl: (index, url) => {
       const links = [...(activePage.socialLinks || [])];

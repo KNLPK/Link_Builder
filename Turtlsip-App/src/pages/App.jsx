@@ -3,7 +3,9 @@ import { CheckCircle, CloudUpload, Edit3, GripVertical, Image as ImageIcon, Link
 import { useEffect, useState } from 'react';
 import '../styles/App.css';
 import logo from '../assets/turtlsip_logo_text.svg';
-import { TurtlsipLogic } from '../hooks/TurtlsipLogic.js';
+import { TurtlsipLogic } from '../hooks/TurtlsipLogic.js'; 
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 function App() {
   const {
@@ -11,7 +13,7 @@ function App() {
     addPage, updateProfile, updateProfileImage, processFileToBase64,
     addSocial, updateSocialUrl, removeSocial, addBlock, deleteBlock, reorderBlocks,
     setFullPageData
-  } = TurtlsipLogic();
+  } = TurtlsipLogic(); 
 
   const [modal, setModal] = useState({ type: null, open: false, targetId: null });
   const [tempData, setTempData] = useState({ label: '', url: '', content: '', pageName: '' });
@@ -31,7 +33,7 @@ function App() {
 
   const loadInitialData = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/pages');
+      const response = await axios.get(`${API_BASE_URL}/api/pages`);
       if (response.data && response.data.length > 0) {
         setFullPageData(response.data[0]);
         showToast("Database Synced");
@@ -45,7 +47,7 @@ function App() {
   };
 
   useEffect(() => {
-    document.title = "Builder TurtlSip";
+    document.title = "Builder — TurtlSip"; 
     loadInitialData();
   }, []);
 
@@ -55,7 +57,7 @@ function App() {
     }
 
     try {
-      const response = await axios.post('http://localhost:3001/api/save', activePage);
+      const response = await axios.post(`${API_BASE_URL}/api/save`, activePage);
       if (response.data.success) {
         showToast("Changes Published to PostgreSQL!");
       }
@@ -71,6 +73,9 @@ function App() {
       try {
         const base64Data = await processFileToBase64(file);
         addBlock('image', { content: base64Data });
+        
+        e.target.value = ''; 
+        
         closeModal();
         showToast("Image Block Added");
       } catch (error) {
@@ -126,17 +131,35 @@ function App() {
             <h3>Page Settings</h3>
             <div className="form-group">
               <label>Profile Photo</label>
-              <div className="img-preview"><img src={activePage.profileImg || `https://ui-avatars.com/api/?name=${activePage.headline || 'User'}`} alt="Profile" /></div>
+              <div className="img-preview">
+                <img src={activePage.profileImg || `https://ui-avatars.com/api/?name=${activePage.headline || 'User'}`} alt="Profile" />
+              </div>
               <label htmlFor="profile-upload" className="file-label"><CloudUpload size={16} /> Change Photo</label>
-              <input type="file" id="profile-upload" hidden onChange={(e) => updateProfileImage(e.target.files[0])} accept="image/*" />
+              <input 
+                type="file" 
+                id="profile-upload" 
+                hidden 
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) updateProfileImage(file); 
+                }} 
+                accept="image/*" 
+              />
             </div>
-            <div className="form-group"><label>Headline</label><input type="text" value={activePage.headline || ''} onChange={(e) => updateProfile('headline', e.target.value)} placeholder="@username" /></div>
-            <div className="form-group"><label>Bio</label><input type="text" value={activePage.title || ''} onChange={(e) => updateProfile('title', e.target.value)} placeholder="Short Bio" /></div>
+            <div className="form-group">
+              <label>Headline</label>
+              <input type="text" value={activePage.headline || ''} onChange={(e) => updateProfile('headline', e.target.value)} placeholder="@username" />
+            </div>
+            <div className="form-group">
+              <label>Bio</label>
+              <input type="text" value={activePage.title || ''} onChange={(e) => updateProfile('title', e.target.value)} placeholder="Short Bio" />
+            </div>
 
-            <hr className="separator" /><label>Social Links</label>
+            <hr className="separator" />
+            <label>Social Links</label>
             <div className="social-links-list">
               {activePage.socialLinks?.map((link, idx) => (
-                <div key={idx} className="social-input-item">
+                <div key={link.id || `${link.type}-${idx}`} className="social-input-item">
                   <div className="drag-handle"><GripVertical size={16} /></div>
                   <i className={`fa-brands fa-${link.type}`}></i>
                   <input type="text" value={link.url} onChange={(e) => updateSocialUrl(idx, e.target.value)} placeholder="URL" />
@@ -177,7 +200,7 @@ function App() {
                   <div className="block-info-text">
                     {block.type === 'image' ?
                       <img src={block.content} alt="Thumb" className="block-thumb" /> :
-                      (block.label || block.content)
+                      (block.label || block.content || 'Untitled Block')
                     }
                   </div>
                   <button className="btn-delete" onClick={() => deleteBlock(idx)}><Trash2 size={16} /></button>
@@ -201,8 +224,9 @@ function App() {
                 <h3>Create Page</h3>
                 <input type="text" value={tempData.pageName} onChange={(e) => setTempData({ ...tempData, pageName: e.target.value })} placeholder="Page Name" />
                 <button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => {
-                  if (!tempData.pageName.trim()) return showToast("Error: Page name is required!");
-                  addPage(tempData.pageName); closeModal(); showToast("Page Created");
+                  const trimmedName = tempData.pageName.trim(); // Normalisasi input
+                  if (!trimmedName) return showToast("Error: Page name is required!");
+                  addPage(trimmedName); closeModal(); showToast("Page Created");
                 }}>Create</button>
               </>
             )}
@@ -212,8 +236,9 @@ function App() {
                 <h3>Rename Page</h3>
                 <input type="text" value={tempData.pageName} onChange={(e) => setTempData({ ...tempData, pageName: e.target.value })} placeholder="New Name" />
                 <button className="btn primary full-width" style={{ marginTop: '15px' }} onClick={() => {
-                  if (!tempData.pageName.trim()) return showToast("Error: Name cannot be empty!");
-                  renamePage(modal.targetId, tempData.pageName); closeModal(); showToast("Page Renamed");
+                  const trimmedName = tempData.pageName.trim(); // Normalisasi input
+                  if (!trimmedName) return showToast("Error: Name cannot be empty!");
+                  renamePage(modal.targetId, trimmedName); closeModal(); showToast("Page Renamed");
                 }}>Rename</button>
               </>
             )}
@@ -238,7 +263,7 @@ function App() {
                   if (!tempData.label.trim() || !tempData.url.trim()) {
                     return showToast("Error: Label or URL are required!");
                   }
-                  addBlock('button', { label: tempData.label, url: tempData.url });
+                  addBlock('button', { label: tempData.label.trim(), url: tempData.url.trim() });
                   closeModal();
                   showToast("Link Block Added");
                 }}>Save</button>
@@ -253,7 +278,7 @@ function App() {
                   if (!tempData.content.trim()) {
                     return showToast("Error: Text content cannot be empty!");
                   }
-                  addBlock('text', { content: tempData.content });
+                  addBlock('text', { content: tempData.content.trim() });
                   closeModal();
                   showToast("Text Block Added");
                 }}>Save</button>
