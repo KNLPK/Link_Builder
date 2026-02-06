@@ -22,7 +22,7 @@ Buat file `.env` di dalam folder `turtlsip-builder/server/` dan tambahkan baris 
 
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/turtlsip_db?schema=public"
-
+```
 
 ### 🚀 Installation & Running
 
