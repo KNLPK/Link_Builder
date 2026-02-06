@@ -30,8 +30,6 @@ Untuk menjalankan ekosistem **TurtlSip** secara lokal, buka tiga terminal terpis
 
 | Terminal | Perintah | Port | Peran Utama |
 | :--- | :--- | :--- | :--- |
-| **Terminal 1** | `npm run dev` (di root) | `:5173` | **Frontend**: Editor UI TurtlSip |
-| **Terminal 2** | `npm run dev` (di folder `server`) | `:3001` | **Backend**: Jembatan API ke Database |
-| **Terminal 3** | `npx prisma studio` (di folder `server`) | `:5555` | **DB Viewer**: Monitoring data secara visual |
-
-> **Pro-Tip**: Pastikan **Terminal 2** sudah berjalan stabil sebelum Anda mulai mengedit di **Terminal 1**, agar fitur *Auto-Save* tidak mengalami kegagalan koneksi.
+| **Terminal 1** | `npm run dev` (di root) | `:5173` | **Frontend** |
+| **Terminal 2** | `npm run dev` (di folder `server`) | `:3001` | **Backend** |
+| **Terminal 3** | `npx prisma studio` (di folder `server`) | `:5555` | **DB Viewer** |
